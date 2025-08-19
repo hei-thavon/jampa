@@ -1,7 +1,7 @@
-import { defineConfig } from 'vite';
-// ...existing code...
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react-swc";
+
 export default defineConfig({
-  base: '/jampa/',
-  // ...other config...
+  plugins: [react()],
+  base: "/jampa/",   // must match repo name (lowercase)
 });
-// ...existing code...

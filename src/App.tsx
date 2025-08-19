@@ -15,7 +15,7 @@ export default function App() {
     // Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio ?? 1, 2));
     renderer.shadowMap.enabled = true;
     mount.appendChild(renderer.domElement);
 
@@ -40,7 +40,7 @@ export default function App() {
     // Ground
     const ground = new THREE.Mesh(
       new THREE.CircleGeometry(30, 64),
-      new THREE.MeshToonMaterial({ color: 0xa3e48c, flatShading: true })
+      new THREE.MeshToonMaterial({ color: 0xa3e48c })
     );
     ground.rotation.x = -Math.PI / 2;
     ground.receiveShadow = true;
@@ -49,7 +49,7 @@ export default function App() {
     // Road ring
     const road = new THREE.Mesh(
       new THREE.RingGeometry(5.5, 6.5, 64),
-      new THREE.MeshToonMaterial({ color: 0xcfd6df, flatShading: true })
+      new THREE.MeshToonMaterial({ color: 0xcfd6df })
     );
     road.rotation.x = -Math.PI / 2;
     road.position.y = 0.01;
@@ -58,7 +58,7 @@ export default function App() {
     // Character placeholder
     const character = new THREE.Mesh(
       new THREE.CapsuleGeometry(0.35, 1.0, 8, 16),
-      new THREE.MeshToonMaterial({ color: 0xff9fb3, flatShading: true })
+      new THREE.MeshToonMaterial({ color: 0xff9fb3 })
     );
     character.position.set(0, 1, 0);
     character.castShadow = true;
@@ -69,7 +69,7 @@ export default function App() {
     controls.target.set(0, 1, 0);
     controls.enableDamping = true;
 
-    // Resize (works in iframes too)
+    // Resize (observer + window for safety)
     const onResize = () => {
       if (!mount) return;
       width = mount.clientWidth;
@@ -79,7 +79,7 @@ export default function App() {
       camera.updateProjectionMatrix();
     };
     const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(onResize) : null;
-    if (ro) ro.observe(mount);
+    ro?.observe(mount);
     window.addEventListener("resize", onResize);
 
     // Animation loop
@@ -94,11 +94,10 @@ export default function App() {
 
     // Cleanup
     return () => {
-      if (ro) ro.disconnect();
+      ro?.disconnect();
       window.removeEventListener("resize", onResize);
       cancelAnimationFrame(frameId);
       controls.dispose();
-      // free GPU memory
       scene.traverse((obj: any) => {
         obj.geometry?.dispose?.();
         if (Array.isArray(obj.material)) obj.material.forEach((m: any) => m?.dispose?.());
